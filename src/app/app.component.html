@@ -253,12 +253,12 @@
     <div class="container chatContainer">
       
       <div class="chats">
-        <div class="chatDiv">
+        <div class="chatDiv" *ngFor="let data of chatData">
           <div class="userQueryDiv">
             <div class="userQuery">
-              <p>Name two technologies helping to connect to the database real time</p>
+              <p>{{ data.query }}</p>
             </div>
-            <p>9:08 AM</p>
+            <p>{{ data.time }}</p>
 
           </div>
 
@@ -267,7 +267,7 @@
               <img src="assets/logo.png" alt="Logo"/>
             </div>
             <div class="responseBox">
-              <p>Name two technologies helping to connect to the database real time.Name two technologies helping to connect to the database real time.Name two technologies helping to connect to the database real time.Name two technologies helping to connect to the database real time</p>
+              <p>{{ data.response }}</p>
             </div>
           </div>
         </div>
@@ -276,18 +276,19 @@
     </div>
     <div class="container queryContainer m-0 d-flex align-items-center">
       <div class="queryEntryContainer m-0 p-1 bg-body-secondary">
-        <input class="queryInput" type="text" placeholder="Ask me anything."/>
-      </div >
+        <input class="queryInput" type="text" placeholder="Ask me anything." (keyup.enter)="sendQuery()" [(ngModel)]="inputValue" />
+      </div>
+      
       
       <div class="queryButtons">
         
-          <button type="button " class="btn btn-primary m-1 sendBtn">
+          <button type="button " class="btn btn-primary m-1 sendBtn" (click)="sendQuery()">
             <img class="iconImage" src="assets/send.png" alt="Send">
           </button>
 
         
         
-          <button type="button " class="btn btn-primary m-1 refreshBtn">
+          <button type="button " class="btn btn-primary m-1 refreshBtn" (click)="refreshQuery()">
             <img class="iconImage" src="assets/refresh.png" alt="Refresh">
           </button>
 
