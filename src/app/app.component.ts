@@ -11,7 +11,7 @@ import { tap } from 'rxjs/operators';
 export class AppComponent {
 
   private djangoUrl = 'http://127.0.0.1:8000'; // Replace with your Django backend URL
-  private testingdjangoUrl = 'http://127.0.0.1:8000/appname/alishba/'; // Replace with your Django backend URL
+  private testingdjangoUrl = 'http://127.0.0.1:8000/appname/chat/'; // Replace with your Django backend URL
   chatData = [
     { query: "", response: "", time: "" },
     
