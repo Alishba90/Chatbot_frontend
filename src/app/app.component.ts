@@ -14,7 +14,7 @@ export class AppComponent implements AfterViewChecked {
 
   @ViewChild('scrollDiv', { static: true }) private myScrollContainer: ElementRef;//scrollable chat window
 
-  isButtonDisabled: boolean = true;
+  isButtonDisabled: boolean = false;
 
   private djangoUrl = 'http://127.0.0.1:8000'; // Replace with your Django backend URL
   private testingdjangoUrl = 'http://127.0.0.1:8000/appname/chat/'; // Replace with your Django backend URL
