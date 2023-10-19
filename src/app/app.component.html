@@ -231,6 +231,14 @@
     
 
   }
+  .initialmsg{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 97%;
+    opacity: 0.3;
+    font-size: small;
+  }
   /* Responsive Styles */
   @media screen and (max-height: 340px) {
     .mainIconHeaders{
@@ -300,8 +308,9 @@
         </div>
       </nav>
     </div>
-    <div class="container chatContainer">
-      
+    <div class="container chatContainer" id="chatContainer">
+      <p  *ngIf="showInitialMsg" class="initialmsg">Ask a question to start the conversation</p>
+
       <div class="chats">
         <div *ngFor="let data of chatData">
         <div class="chatDiv"  *ngIf="data.query.trim() !== ''">

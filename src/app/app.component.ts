@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component  ,Renderer2,ElementRef} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 @Component({
@@ -9,7 +9,7 @@ import { tap } from 'rxjs/operators';
 
 
 export class AppComponent {
-
+  showInitialMsg: boolean = true;
   private djangoUrl = 'http://127.0.0.1:8000'; // Replace with your Django backend URL
   private testingdjangoUrl = 'http://127.0.0.1:8000/appname/chat/'; // Replace with your Django backend URL
   chatData = [
@@ -18,8 +18,10 @@ export class AppComponent {
     // Add more objects as needed
   ];
 
-
-  constructor(private http: HttpClient) {}
+  ngAfterViewInit() {
+    this.setScrollbarVisibility();
+  }
+  constructor(private http: HttpClient,private renderer: Renderer2,private elRef: ElementRef) {}
 
   
 
@@ -27,6 +29,9 @@ export class AppComponent {
 
   sendQuery() {
     if (this.inputValue.trim() !== '') {
+      if(this.showInitialMsg){
+        this.showInitialMsg=false
+      }
       const date = new Date(); // Replace this line with your date string
       const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
       let query = this.inputValue;
@@ -52,7 +57,6 @@ export class AppComponent {
       this.inputValue = ''; // Clear the input value after sending the query
     }
   }
-  
   formatResponse(response: string): string {
     const stepsRegex = /\d+\.\s/g;
     const stepsReplaced = response.replace(stepsRegex, (match) => {
@@ -60,10 +64,20 @@ export class AppComponent {
     });
     return stepsReplaced;
   }
+  setScrollbarVisibility() {
+
+    const targetDiv = this.elRef.nativeElement.querySelector('#chatContainer'); // Replace 'your-div-id' with your div's ID
+    if (this.showInitialMsg) {
+      this.renderer.setStyle(targetDiv, 'overflow', 'hidden');
+    } else {
+      this.renderer.removeStyle(targetDiv, 'overflow');
+    }
+  }
   
   refreshQuery() {
     if (this.chatData.length > 0) {
       const lastQuery = this.chatData[this.chatData.length - 1].query;
+      this.chatData[this.chatData.length - 1].response='';
       this.http.post(this.testingdjangoUrl, { query: lastQuery }).pipe(
         tap(
           (response: any) => {
