@@ -345,13 +345,13 @@
       
       <div class="queryButtons">
         
-          <button type="button " class="btn btn-primary m-1 sendBtn" (click)="sendQuery()">
+          <button type="button " class="btn btn-primary m-1 sendBtn" (click)="sendQuery()" [disabled]="isButtonDisabled">
             <img class="iconImage" src="assets/send.png" alt="Send">
           </button>
 
         
         
-          <button type="button " class="btn btn-primary m-1 refreshBtn" (click)="refreshQuery()">
+          <button type="button " class="btn btn-primary m-1 refreshBtn" (click)="refreshQuery()" [disabled]="isButtonDisabled">
             <img class="iconImage" src="assets/refresh.png" alt="Refresh">
           </button>
 

@@ -9,8 +9,13 @@ import { tap } from 'rxjs/operators';
 
 
 export class AppComponent implements AfterViewChecked {
-  showInitialMsg: boolean = true;
-  @ViewChild('scrollDiv', { static: true }) private myScrollContainer: ElementRef;
+
+  showInitialMsg: boolean = true;//initial msg display before any conversation initiation
+
+  @ViewChild('scrollDiv', { static: true }) private myScrollContainer: ElementRef;//scrollable chat window
+
+  isButtonDisabled: boolean = true;
+
   private djangoUrl = 'http://127.0.0.1:8000'; // Replace with your Django backend URL
   private testingdjangoUrl = 'http://127.0.0.1:8000/appname/chat/'; // Replace with your Django backend URL
   chatData = [
@@ -18,6 +23,10 @@ export class AppComponent implements AfterViewChecked {
     
     // Add more objects as needed
   ];
+
+  toggleButton() {
+    this.isButtonDisabled = !this.isButtonDisabled;
+  }
 
   ngAfterViewInit() {
     this.setScrollbarVisibility();
@@ -59,7 +68,7 @@ export class AppComponent implements AfterViewChecked {
     //push the values to the chat window
     let query = this.inputValue;
     this.chatData.push({ query: this.inputValue, response: '', time: formattedTime });
-
+    this.toggleButton()  
     //scroll the chat window to the most recent query
     this.scrollToBottom();
 
@@ -78,7 +87,7 @@ export class AppComponent implements AfterViewChecked {
             if (index !== -1) {
               this.chatData[index].response = this.formatResponse(response.response);
               query = '';
-
+              this.toggleButton()
             
             }
             console.log('Response from backend:', response);
@@ -117,7 +126,7 @@ export class AppComponent implements AfterViewChecked {
     if (this.chatData.length > 0) {
       const lastQuery = this.chatData[this.chatData.length - 1].query;
       this.chatData[this.chatData.length - 1].response='';
-
+      this.toggleButton()
       //scroll the chat window to the most recent query
       this.scrollToBottom();
 
@@ -129,10 +138,10 @@ export class AppComponent implements AfterViewChecked {
 
             //scroll the chat window to the most recent response
             this.scrollToBottom();
-            
+
             if (index !== -1) {
               this.chatData[index].response = response.response;
-              
+              this.toggleButton()
             }
             console.log('Response from backend:', response);
           },
