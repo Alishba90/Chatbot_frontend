@@ -1,4 +1,4 @@
-import { Component  ,Renderer2,ElementRef} from '@angular/core';
+import { Component  ,Renderer2,ElementRef,ViewChild, AfterViewChecked} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 @Component({
@@ -8,8 +8,9 @@ import { tap } from 'rxjs/operators';
 })
 
 
-export class AppComponent {
+export class AppComponent implements AfterViewChecked {
   showInitialMsg: boolean = true;
+  @ViewChild('scrollDiv', { static: true }) private myScrollContainer: ElementRef;
   private djangoUrl = 'http://127.0.0.1:8000'; // Replace with your Django backend URL
   private testingdjangoUrl = 'http://127.0.0.1:8000/appname/chat/'; // Replace with your Django backend URL
   chatData = [
@@ -21,31 +22,64 @@ export class AppComponent {
   ngAfterViewInit() {
     this.setScrollbarVisibility();
   }
-  constructor(private http: HttpClient,private renderer: Renderer2,private elRef: ElementRef) {}
+  constructor(private http: HttpClient,private renderer: Renderer2,private elRef: ElementRef) {
+    this.myScrollContainer = new ElementRef(null);
+  }
 
   
 
   inputValue: string = '';
+
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
+  scrollToBottom(): void {
+    try {
+      this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
+      this.renderer.setStyle(this.elRef.nativeElement.querySelector('#chatContainer'), 'overflow-y', 'scroll');
+    } catch(err) { }
+  }
+
 
   sendQuery() {
     if (this.inputValue.trim() !== '') {
       if(this.showInitialMsg){
         this.showInitialMsg=false
       }
-      const date = new Date(); // Replace this line with your date string
-      const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
-      let query = this.inputValue;
-      const formattedTime = date.getHours() + ':' + date.getMinutes() + ' ' + ampm;
-      this.chatData.push({ query: this.inputValue, response: '', time: formattedTime });
+
+      //add the current time to the user query
+    const date = new Date(); 
+    const hours = date.getHours() % 12 || 12; // Convert 24-hour time to 12-hour time
+    const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+    const formattedTime = hours + ':' + minutes + ' ' + ampm;
+
+    //push the values to the chat window
+    let query = this.inputValue;
+    this.chatData.push({ query: this.inputValue, response: '', time: formattedTime });
+
+    //scroll the chat window to the most recent query
+    this.scrollToBottom();
+
+    //send the query to the backend
   
       this.http.post(this.testingdjangoUrl, { query: this.inputValue }).pipe(
         tap(
           (response: any) => {
             // Handle the response from the backend here
             const index = this.chatData.findIndex(item => item.query === query);
+
+            //scroll the chat window to the most recent response
+            this.scrollToBottom();
+            
+            //update response in the chat window
             if (index !== -1) {
               this.chatData[index].response = this.formatResponse(response.response);
               query = '';
+
+            
             }
             console.log('Response from backend:', response);
           },
@@ -58,12 +92,16 @@ export class AppComponent {
     }
   }
   formatResponse(response: string): string {
+
+    //format the response to preserve the original format
     const stepsRegex = /\d+\.\s/g;
     const stepsReplaced = response.replace(stepsRegex, (match) => {
       return '\n' + match;
     });
     return stepsReplaced;
   }
+
+//hide the scrollbar when there are no chats or else display  
   setScrollbarVisibility() {
 
     const targetDiv = this.elRef.nativeElement.querySelector('#chatContainer'); // Replace 'your-div-id' with your div's ID
@@ -71,6 +109,7 @@ export class AppComponent {
       this.renderer.setStyle(targetDiv, 'overflow', 'hidden');
     } else {
       this.renderer.removeStyle(targetDiv, 'overflow');
+      this.renderer.setStyle(targetDiv, 'overflow', 'scroll');
     }
   }
   
@@ -78,11 +117,19 @@ export class AppComponent {
     if (this.chatData.length > 0) {
       const lastQuery = this.chatData[this.chatData.length - 1].query;
       this.chatData[this.chatData.length - 1].response='';
+
+      //scroll the chat window to the most recent query
+      this.scrollToBottom();
+
       this.http.post(this.testingdjangoUrl, { query: lastQuery }).pipe(
         tap(
           (response: any) => {
             // Handle the response from the backend here
             const index = this.chatData.findIndex(item => item.query ===lastQuery );
+
+            //scroll the chat window to the most recent response
+            this.scrollToBottom();
+            
             if (index !== -1) {
               this.chatData[index].response = response.response;
               
@@ -100,4 +147,3 @@ export class AppComponent {
   }
 
 }
-

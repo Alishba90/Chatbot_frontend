@@ -120,7 +120,7 @@
   }
 
   .chats{
-    
+ 
     margin: 0.6rem 3rem;
     
   }
@@ -308,10 +308,10 @@
         </div>
       </nav>
     </div>
-    <div class="container chatContainer" id="chatContainer">
+    <div class="container chatContainer" id="chatContainer" #scrollDiv >
       <p  *ngIf="showInitialMsg" class="initialmsg">Ask a question to start the conversation</p>
 
-      <div class="chats">
+      <div class="chats" id="chats">
         <div *ngFor="let data of chatData">
         <div class="chatDiv"  *ngIf="data.query.trim() !== ''">
           <div class="userQueryDiv">
